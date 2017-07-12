@@ -1,3 +1,6 @@
+# Need to use a socket so that we can transport large amounts of data. 
+# this code was copied from somewhere on the net. 
+
 # first of all import the socket library
 import socket
 
