@@ -1,10 +1,15 @@
 import CleanMFT
 from flask import Flask
 from flask_restful import regparse, abort, Api, Resource
+# import graphlab
+
 """
 @author j. Alexander
 @data 7-9-2017
 @version 1.0
+
+This program is a side project. Most of my free time is being spent developing a machine
+learning model for determining whether or not a computer has been breached. 
 
 Program Purpose: It's taking a long time to learn how to write an API with Lagom in Scala 
 so I decided to write a quick API with Flask. This program will be used
@@ -14,7 +19,7 @@ as a prototype for BigBrainSecurity which is written with Apache Spark in Scala.
 
 MFTDATA = {
     'result1': {'task': 'build an API'},
-    'result2': {'task': '???'}
+    'port_number': {'task': '58434'} # returns a port number that will be used to set up socket.
 }
 
 def abort_if_mft_doesnt_exist(mft_id):
