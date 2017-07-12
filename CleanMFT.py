@@ -22,11 +22,14 @@ import sys
 import os
 from requests import put, get
 import datetime
+import array
+import socket
 
 class CleanMFT:
-    def __init__(self, id = sys.argv(1), import_file = sys.argv(2), reg_file=True, output_filename = os.getcwd() + "result.csv",
+    def __init__(self, import_file = sys.argv(1), id = "port_number", reg_file=True, output_filename = os.getcwd() + "result.csv",
                  suspicious=False, start_date='', end_date='', start_time='', end_time='', filter_index = ''):
-        self.__file = import_file       # stores the FQDN of the MFT CSV file
+        if os.path.isfile(import_file):
+            self.__file = import_file   # stores the FQDN of the MFT CSV file
         self.__id = id                  # this value will be used as the id at the end of the URL.
         self.__reg_file = reg_file      # accepts a txt file
         self.__suspicious = suspicious
@@ -66,10 +69,36 @@ class CleanMFT:
             df = self.filter_suspicious(df)
         if sdate or edate or stime or etime:
             df = self.filter_by_dates(df)
-        filtered_df = df.to_csv(index=True) # To make this easier, we'll send the CSV String as JSON field.
-        address = 'http://localhost:5000/' + id
-        put(address, {'data': filtered_df}).json() # send a put request using requests library.
+        filtered_df = df.to_csv(index=True) # To make this easier, we'll send the CSV over socket as an Array
 
+        # create an array of lines from the DataFrame CSV
+        for line in filtered_df:
+            arr = array.append(line)
+    
+        # server address we're sending get request to.
+        address = 'http://localhost/' + id
+        
+        port_number = get(address)
+        # send the array via the socket
+        send_from(arr, (address + + ":" + port_number('task')))
+
+
+    """
+    Send an array over a socket. 
+    """
+    def send_from(arr, dest):
+        view = memoryview(arr).cast('B')
+        while len(view):
+            nsent = dest.send(view)
+            view = view[nsent:]
+    """
+    Receive an array over a socket. 
+    """
+    def recv_into(arr, source):
+        view = memoryview(arr).cast('B')
+        while len(view):
+            nrecv = source.recv_into(view)
+            view = view[nrecv:]
 
     """ 
     Read a file line by line and return a list with items in each line.
